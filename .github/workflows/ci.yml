@@ -131,7 +131,7 @@ jobs:
       - name: "[Setup] Checkout bookverse-infra for shared scripts"
         uses: actions/checkout@v4
         with:
-          repository: yonatanp-jfrog/bookverse-infra
+          repository: tomjfrog/bookverse-infra
           path: bookverse-infra
       
       # 🧠 Analysis: Frontend-optimized commit analysis for deployment decisions
@@ -190,7 +190,7 @@ jobs:
       - name: "[Setup] Checkout bookverse-infra for shared scripts"
         uses: actions/checkout@v4
         with:
-          repository: yonatanp-jfrog/bookverse-infra
+          repository: tomjfrog/bookverse-infra
           path: bookverse-infra
 
       - name: "[Info] Trigger Information"
@@ -216,9 +216,10 @@ jobs:
 
       - name: "[Setup] JFrog CLI"
         uses: jfrog/setup-jfrog-cli@v4
-        id: jfrog-cli-auth
         with:
           version: 2.88.0
+        id: jfrog-cli-auth
+        with:
           oidc-provider-name: bookverse-web-github
           oidc-audience: ${{ vars.JFROG_URL }}
         env:
@@ -331,7 +332,7 @@ jobs:
           fi
           
           REGISTRY_URL="${{ vars.DOCKER_REGISTRY }}"
-          REPO_KEY="${{ vars.PROJECT_KEY }}-$SERVICE_NAME-internal-docker-nonprod-local"
+          REPO_KEY="${{ vars.PROJECT_KEY }}-$SERVICE_NAME-internal-docker-dev-local"
           IMAGE_NAME="$REGISTRY_URL/$REPO_KEY/$SERVICE_NAME:$IMAGE_TAG"
           
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
@@ -383,7 +384,7 @@ jobs:
           
           tar -czf "web-assets-$WEB_ASSETS_VERSION.tar.gz" -C dist .
           
-          GENERIC_REPO="${{ vars.PROJECT_KEY }}-$SERVICE_NAME-internal-generic-nonprod-local"
+          GENERIC_REPO="${{ vars.PROJECT_KEY }}-$SERVICE_NAME-internal-generic-dev-local"
           jf rt upload "web-assets-$WEB_ASSETS_VERSION.tar.gz" "$GENERIC_REPO/$SERVICE_NAME/assets/$WEB_ASSETS_VERSION/web-assets-$WEB_ASSETS_VERSION.tar.gz" \
             --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER" --project "${{ vars.PROJECT_KEY }}"
           echo "✅ Web assets package uploaded with version $WEB_ASSETS_VERSION"
@@ -392,6 +393,7 @@ jobs:
         env:
           EVIDENCE_PRIVATE_KEY: ${{ secrets.EVIDENCE_PRIVATE_KEY }}
           EVIDENCE_KEY_ALIAS: ${{ vars.EVIDENCE_KEY_ALIAS }}
+          PACKAGE_REPO_STAGE_SUFFIX: dev
         run: |
           echo "📦 Generating evidence for web assets package using shared library"
           echo "📦 Target Package: web-assets:$WEB_ASSETS_VERSION"
@@ -434,7 +436,7 @@ jobs:
             echo "✅ Successfully pushed using modern jf docker push command"
           else
             echo "⚠️ Modern command failed (likely Artifactory < 7.33.3), using deprecated command..."
-            REPO_KEY="${{ vars.PROJECT_KEY }}-$SERVICE_NAME-internal-docker-nonprod-local"
+            REPO_KEY="${{ vars.PROJECT_KEY }}-$SERVICE_NAME-internal-docker-dev-local"
             jf rt docker-push "$IMAGE_NAME" "$REPO_KEY" \
               --build-name "$BUILD_NAME" \
               --build-number "$BUILD_NUMBER" \
@@ -449,6 +451,7 @@ jobs:
         env:
           EVIDENCE_PRIVATE_KEY: ${{ secrets.EVIDENCE_PRIVATE_KEY }}
           EVIDENCE_KEY_ALIAS: ${{ vars.EVIDENCE_KEY_ALIAS }}
+          PACKAGE_REPO_STAGE_SUFFIX: dev
         run: |
           echo "🛡️ Generating evidence for web image package using shared library"
           echo "📦 Target Package: web:$WEB_VERSION"
@@ -550,14 +553,15 @@ jobs:
       - name: "[Setup] Checkout bookverse-infra for shared scripts"
         uses: actions/checkout@v4
         with:
-          repository: yonatanp-jfrog/bookverse-infra
+          repository: tomjfrog/bookverse-infra
           path: bookverse-infra
 
       - name: "[Setup] JFrog CLI"
         uses: jfrog/setup-jfrog-cli@v4
-        id: jfrog-cli-auth
         with:
           version: 2.88.0
+        id: jfrog-cli-auth
+        with:
           oidc-provider-name: bookverse-web-github
           oidc-audience: ${{ vars.JFROG_URL }}
         env:
