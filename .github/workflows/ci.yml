@@ -220,7 +220,6 @@ jobs:
         with:
           version: 2.88.0
           oidc-provider-name: bookverse-web-github
-          oidc-audience: ${{ vars.JFROG_URL }}
         env:
           JF_URL: ${{ vars.JFROG_URL }}
           JF_PROJECT: ${{ vars.PROJECT_KEY }}
@@ -561,7 +560,6 @@ jobs:
         with:
           version: 2.88.0
           oidc-provider-name: bookverse-web-github
-          oidc-audience: ${{ vars.JFROG_URL }}
         env:
           JF_URL: ${{ vars.JFROG_URL }}
           JF_PROJECT: ${{ vars.PROJECT_KEY }}

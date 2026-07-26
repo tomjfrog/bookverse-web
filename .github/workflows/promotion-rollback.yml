@@ -149,7 +149,6 @@ jobs:
           version: latest
           oidc-provider-name: bookverse-web-github
           disable-job-summary: true
-          oidc-audience: ${{ vars.JFROG_URL }}
 
       - name: "[Rollback] Execute"
         shell: bash
